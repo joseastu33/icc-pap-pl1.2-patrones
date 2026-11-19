@@ -1,5 +1,7 @@
 package icc.pap.pl1.patrones.modelo;
 
-public class TipoComidaSnake {
-    
+public enum TipoComidaSnake {
+    NORMAL,
+    PUNTUACION_DOBLE,
+    VELOCIDAD
 }
