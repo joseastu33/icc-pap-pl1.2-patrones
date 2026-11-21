@@ -50,15 +50,23 @@ public class SerpienteSnake {
     public void mover(boolean crece){
         //el cuerpo de la serpiente es desplazado de la cola a la cabeza
         //lo cual permite NO sobreescribir posiciones que se necesiten
+
+        //nueva posicion de la CABEZA
+        CoordenadasTablero nuevaPosicionCabeza = calcularSiguientePosicion();
+
+        //la posicion ANTERIOR de la COLA se guarda
+        SegmentoSnake colaSnake = cuerpoSerpiente.getLast();
+        CoordenadasTablero posicionAnteriorCola = colaSnake.getCoordenadasTablero();
+
         for(int i = cuerpoSerpiente.size() -1; i > 0; i--){
             SegmentoSnake segmentoActual = cuerpoSerpiente.get(i);
             SegmentoSnake segmentoAnterior = cuerpoSerpiente.get(i-1); //un indice atrás ESTA el segmento ANTERIOR
             segmentoActual.setCoordenadasTablero(segmentoAnterior.getCoordenadasTablero());
         }
-        CoordenadasTablero nuevaPosicion = calcularSiguientePosicion();
-        cuerpoSerpiente.getFirst().setCoordenadasTablero(nuevaPosicion); //la cabeza es actualizada a la nueva posición
-        if(crece == true){
-            cuerpoSerpiente.add(new SegmentoSnake(posicionAnteriorCola))
+        cuerpoSerpiente.getFirst().setCoordenadasTablero(nuevaPosicionCabeza);
+        
+        if(crece){
+            cuerpoSerpiente.add(new SegmentoSnake(posicionAnteriorCola));
         }
 
     }
