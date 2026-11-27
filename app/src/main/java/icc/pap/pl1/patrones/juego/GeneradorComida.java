@@ -49,7 +49,7 @@ public class GeneradorComida {
         } else if (numero <= 79){
             tipo = TipoComidaSnake.VELOCIDAD;
         } else {
-            tipo = TipoComidaSnake.CRECIMIENTO_CABEZA; //Se añade un efecto para hacer crecer la cabeza
+            tipo = TipoComidaSnake.CRECIMIENTO; //Se añade un efecto para HACER CRECER EL SEGMENTO
         }
     return new ComidaSnake(coordenadas, tipo);
     }

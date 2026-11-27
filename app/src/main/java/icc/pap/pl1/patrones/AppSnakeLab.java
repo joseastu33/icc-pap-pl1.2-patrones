@@ -7,13 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Timer;
 
+import icc.pap.pl1.patrones.decorador.GestorEfectos;
 import icc.pap.pl1.patrones.juego.MotorJuego;
 import icc.pap.pl1.patrones.juego.PartidaSnake;
+import icc.pap.pl1.patrones.modelo.ComidaSnake;
 import icc.pap.pl1.patrones.modelo.CoordenadasTablero;
 import icc.pap.pl1.patrones.modelo.SegmentoSnake;
 import icc.pap.pl1.patrones.modelo.SentidoMovimiento;
 import icc.pap.pl1.patrones.modelo.SerpienteSnake;
 import icc.pap.pl1.patrones.modelo.TableroJuego;
+import icc.pap.pl1.patrones.modelo.TipoComidaSnake;
+
 import java.util.concurrent.CountDownLatch;
 
 public class AppSnakeLab {
@@ -24,7 +28,9 @@ public class AppSnakeLab {
        cuerpoSerpiente.add(new SegmentoSnake(new CoordenadasTablero(4, 5)));
        cuerpoSerpiente.add(new SegmentoSnake(new CoordenadasTablero(3, 5)));
        SerpienteSnake serpiente = new SerpienteSnake(cuerpoSerpiente, SentidoMovimiento.DERECHA); //SE CREA la serpiente
+       ComidaSnake comidaPrueba = new ComidaSnake(new CoordenadasTablero(6, 5), TipoComidaSnake.PUNTUACION_DOBLE);
        TableroJuego tableroJuego = new TableroJuego(20, 20);
+       PartidaSnake partidaPrueba = new PartidaSnake(tableroJuego, serpiente, comidaPrueba);
        //PartidaSnake partidaSnake = new PartidaSnake(tableroJuego, serpiente);
        //jugando
        //partidaSnake.iniciarJuego();
@@ -45,9 +51,23 @@ public class AppSnakeLab {
 
 
       // PRUEBA DEL MOTOR
-      PartidaSnake partidaPrueba = new PartidaSnake(tableroJuego, serpiente);
       MotorJuego motor = new MotorJuego(partidaPrueba);
 
+      partidaPrueba.agregarObservador(estado -> System.out.println(
+        "Observer 1: ESTADO: " + estado.getEstado() + 
+        " |  + Puntuacion: " + estado.getPuntuacion() 
+      ));
+
+      partidaPrueba.agregarObservador(estado -> System.out.println(
+        "Observer 2: DOBLE PUNTUACION" + estado.isPuntuacionDoble() + 
+        " | Velocidad MODIFICADA: " + estado.isVelocidadModificada()));
+      //PRUEBA OBSERVER + DECORATOR
+      System.out.println("\n---- PRUEBA OBSERVER + DECORATOR ---");
+      partidaPrueba.iniciarJuego();
+
+      //es SIMULADA el CONSUMO de una comida con PUNTUACION DOBLE
+      partidaPrueba.iniciarJuego();
+      partidaPrueba.moverSerpiente();
       CountDownLatch espera = new CountDownLatch(1);
 
     // POSICIÓN INICIAL
@@ -71,6 +91,145 @@ public class AppSnakeLab {
     espera.countDown();
 }).start();
 espera.await();
+    //PRUEBAS DECORATOR: Puntuacion DOBLE
+    GestorEfectos gestorEfectosPrueba = new GestorEfectos();
+    System.out.println("\n---PRUEBA PUNTUACION DOBLE---");
+    System.out.println("Puntos SIN efecto: " + gestorEfectosPrueba.obtenerReglas().calcularPuntos());
+    gestorEfectosPrueba.activar(TipoComidaSnake.PUNTUACION_DOBLE);
+    System.out.println("Puntos CON efecto: " + gestorEfectosPrueba.obtenerReglas().calcularPuntos());
+
+    //ESTADO: PASADO
+
+    //PRUEBAS VELOCIDAD MODIFICADA
+    System.out.println("\n----PRUEBAS VELOCIDAD MODIFICADA----");
+    GestorEfectos gestorVelocidadPrueba = new GestorEfectos();
+    System.out.println("Intervalo SIN efecto: " + gestorVelocidadPrueba.obtenerReglas().obtenerIntervaloMovimiento());
+    gestorVelocidadPrueba.activar(TipoComidaSnake.VELOCIDAD);
+    System.out.println("Intervalo CON efecto: " + gestorVelocidadPrueba.obtenerReglas().obtenerIntervaloMovimiento());
+
+    //PRUEBA EXPIRACION DE UN EFECTO
+    GestorEfectos gestorEfectosExpiracion = new GestorEfectos();
+    gestorEfectosExpiracion.activar(TipoComidaSnake.VELOCIDAD);
+    System.out.println("CON efecto: " + gestorEfectosExpiracion.obtenerReglas().obtenerIntervaloMovimiento());
+    gestorEfectosExpiracion.actualizar(5000, true);
+    System.out.println("TRAS 5 Segundos: " + gestorEfectosExpiracion.obtenerReglas().obtenerIntervaloMovimiento());
+    gestorEfectosExpiracion.actualizar(5000, true);
+    System.out.println("TRAS 10 Segunos: " + gestorEfectosExpiracion.obtenerReglas().obtenerIntervaloMovimiento());
+
+    //PRUEBAS PUNTUACION DOBLE DURACION
+    System.out.println("\n-----PRUEBAS PUNTUACION DOBLE DURACION-----");
+    GestorEfectos gestorPuntos = new GestorEfectos();
+    System.out.println("SIN efecto: " + gestorPuntos.obtenerReglas().calcularPuntos());
+    gestorPuntos.activar(TipoComidaSnake.PUNTUACION_DOBLE);
+    System.out.println("CON efecto: " + gestorPuntos.obtenerReglas().calcularPuntos());
+    gestorPuntos.actualizar(5000, true);
+    System.out.println("TRAS 5 Segundos: " + gestorPuntos.obtenerReglas().calcularPuntos());
+    gestorPuntos.actualizar(5000, true);
+    System.out.println("TRAS 10 Segundos: "+ gestorPuntos.obtenerReglas().calcularPuntos());
+
+
+    //PRUEBAS COLISIONES
+
+    //1: La serpiente intenta salir del tablero y colisiona
+    List<SegmentoSnake> cuerpoPrueba = new ArrayList<>();
+    cuerpoPrueba.add(new SegmentoSnake(new CoordenadasTablero(4, 2)));
+    cuerpoPrueba.add(new SegmentoSnake(new CoordenadasTablero(3, 2)));
+    cuerpoPrueba.add(new SegmentoSnake(new CoordenadasTablero(2,2)));
+    SerpienteSnake serpientePruebaColision = new SerpienteSnake(cuerpoPrueba, SentidoMovimiento.DERECHA); 
+    TableroJuego tableroPrueba1 = new TableroJuego(5, 5);
+    PartidaSnake partidaPrueba1 = new PartidaSnake(tableroPrueba1, serpientePruebaColision);
+
+    //iniciar la prueba
+    partidaPrueba1.iniciarJuego();
+    partidaPrueba1.moverSerpiente();
+    System.out.println(partidaPrueba1.getEstadoActual().getClass().getSimpleName());
+
+    //2: La serpiente colisiona con su propio cuerpo
+    List<SegmentoSnake> cuerpoPrueba2 = new ArrayList<>();
+
+    cuerpoPrueba2.add(new SegmentoSnake(new CoordenadasTablero(2, 1)));
+    cuerpoPrueba2.add(new SegmentoSnake(new CoordenadasTablero(3, 1)));
+    cuerpoPrueba2.add(new SegmentoSnake(new CoordenadasTablero(3, 2)));
+
+    SerpienteSnake serpientePrueba2 =new SerpienteSnake(cuerpoPrueba2, SentidoMovimiento.DERECHA);
+    PartidaSnake partidaPrueba2 = new PartidaSnake(new TableroJuego(5, 5), serpientePrueba2);
+
+    partidaPrueba2.iniciarJuego();
+    partidaPrueba2.moverSerpiente();
+
+    System.out.println(partidaPrueba2.getEstadoActual().getClass().getSimpleName());
+
+    //ESTADO: Pasado
+
+    //3: La cabeza intenta entrar en una posición ocupada por la cola
+    //esta prueba no debe considerarse como una prueba de colisión
+    //la cola abandona su posicion durante el movimiento y eso hace que no colisione y la cabeza pueda ocupar
+    List<SegmentoSnake> cuerpoPrueba3 = new ArrayList<>();
+
+    cuerpoPrueba3.add(new SegmentoSnake(new CoordenadasTablero(2, 2)));
+    cuerpoPrueba3.add(new SegmentoSnake(new CoordenadasTablero(2, 3)));
+    cuerpoPrueba3.add(new SegmentoSnake(new CoordenadasTablero(1, 3)));
+    cuerpoPrueba3.add(new SegmentoSnake(new CoordenadasTablero(1, 2)));
+
+    SerpienteSnake serpientePrueba3 = new SerpienteSnake(cuerpoPrueba3, SentidoMovimiento.IZQUIERDA);
+    TableroJuego tableroPrueba3 = new TableroJuego(5, 5);
+    PartidaSnake partidaPrueba3 = new PartidaSnake(tableroPrueba3, serpientePrueba3);
+    partidaPrueba3.iniciarJuego();
+    partidaPrueba3.moverSerpiente();
+
+    System.out.println(partidaPrueba3.getEstadoActual().getClass().getSimpleName());
+
+
+    //PRUEBAS COMIDA
+    List<SegmentoSnake> cuerpoCrecimiento = new ArrayList<>();
+
+    cuerpoCrecimiento.add(new SegmentoSnake(new CoordenadasTablero(2, 2)));
+    cuerpoCrecimiento.add(new SegmentoSnake(new CoordenadasTablero(1, 2)));
+    cuerpoCrecimiento.add(new SegmentoSnake(new CoordenadasTablero(0, 2)));
+
+    SerpienteSnake serpienteCrecimiento = new SerpienteSnake(cuerpoCrecimiento, SentidoMovimiento.DERECHA);
+    TableroJuego tablero = new TableroJuego(5, 5);
+    ComidaSnake comida = new ComidaSnake(new CoordenadasTablero(3, 2),TipoComidaSnake.CRECIMIENTO);
+    PartidaSnake partida = new PartidaSnake(tablero, serpienteCrecimiento, comida);
+
+    System.out.println("ANTES: "+ serpienteCrecimiento.getCuerpoSerpiente().size());
+    partida.iniciarJuego();
+    partida.moverSerpiente();
+    System.out.println("DESPUÉS: "+ serpienteCrecimiento.getCuerpoSerpiente().size());
+
+
+    //PRUEBA INTEGRADORA Observer + Decorator + State + MotorJuego
+    List<SegmentoSnake> cuerpoIntegracion = new ArrayList<>();
+    cuerpoIntegracion.add(new SegmentoSnake(new CoordenadasTablero(5, 5)));
+    cuerpoIntegracion.add(new SegmentoSnake(new CoordenadasTablero(4, 5)));
+    cuerpoIntegracion.add(new SegmentoSnake(new CoordenadasTablero(3, 5)));
+    SerpienteSnake serpienteIntegracionOrientacion = new SerpienteSnake(cuerpoIntegracion, SentidoMovimiento.DERECHA);
+    //se aumenta el tamaño del TABLERO ---> para que la serpiente NO CHOQUE durante la prueba
+    TableroJuego tableroIntegracion = new TableroJuego(200, 200);
+
+    //comida esta justo delante de la cabeza: para que la serpiente la atrape
+    ComidaSnake comidaIntegracion = new ComidaSnake(new CoordenadasTablero(6, 5), TipoComidaSnake.VELOCIDAD);
+    PartidaSnake partidaIntegracion = new PartidaSnake(tableroIntegracion, serpienteIntegracionOrientacion, comidaIntegracion);
+    MotorJuego motorIntegracion = new MotorJuego(partidaIntegracion);
+
+    partidaIntegracion.agregarObservador(estado -> System.out.println("Observer 1: Estado: " 
+    + estado.getEstado() + " |  Puntuacion: " + estado.getPuntuacion()));
+    partidaIntegracion.agregarObservador(estado -> 
+        System.out.println("Observer #1 : Estado: " 
+        + estado.getEstado() + " | Puntuacion" + estado.getPuntuacion()));
+    partidaIntegracion.agregarObservador(estado -> System.out.println("Observer 2: Velocidad MODIFICADA: " 
+        + estado.isVelocidadModificada()));
+
+    System.out.println("\n--- PRUEBA INTEGRADORA ---");
+    partidaIntegracion.iniciarJuego();
+    motorIntegracion.iniciarMotorJuego();
+    javax.swing.Timer  finIntegracion = new javax.swing.Timer(12_000, e -> {
+        motorIntegracion.detenerMotorJuego();
+        partidaIntegracion.terminarJuego();
+        System.out.println("---- FIN PRUEBA INTEGRADORA ----");});
+    finIntegracion.setRepeats(false);
+    finIntegracion.start();
+    
     }
 
     //metodo de PRUEBA (Auxiliar)
@@ -79,4 +238,5 @@ espera.await();
         System.out.println("Coord X: " + cabeza.getCoordenadasTablero().getCoorX() + "Coord Y: " 
         + cabeza.getCoordenadasTablero().getCoorY());
     }
+
 }

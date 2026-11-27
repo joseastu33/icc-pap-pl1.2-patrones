@@ -47,7 +47,7 @@ public class SerpienteSnake {
         return new CoordenadasTablero(nuevaCoorX, nuevaCoorY);
     }
 
-    public void mover(boolean crece){
+    public void desplazarSegmentos(int cantidadCrecimiento ){
         //el cuerpo de la serpiente es desplazado de la cola a la cabeza
         //lo cual permite NO sobreescribir posiciones que se necesiten
 
@@ -65,7 +65,7 @@ public class SerpienteSnake {
         }
         cuerpoSerpiente.getFirst().setCoordenadasTablero(nuevaPosicionCabeza);
         
-        if(crece){
+        for(int i = 0; i < cantidadCrecimiento; i++){
             cuerpoSerpiente.add(new SegmentoSnake(posicionAnteriorCola));
         }
 
