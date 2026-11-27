@@ -5,6 +5,8 @@ package icc.pap.pl1.patrones;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import icc.pap.pl1.patrones.decorador.GestorEfectos;
@@ -17,6 +19,7 @@ import icc.pap.pl1.patrones.modelo.SentidoMovimiento;
 import icc.pap.pl1.patrones.modelo.SerpienteSnake;
 import icc.pap.pl1.patrones.modelo.TableroJuego;
 import icc.pap.pl1.patrones.modelo.TipoComidaSnake;
+import icc.pap.pl1.patrones.vista.VentanaPrincipal;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -229,6 +232,11 @@ espera.await();
         System.out.println("---- FIN PRUEBA INTEGRADORA ----");});
     finIntegracion.setRepeats(false);
     finIntegracion.start();
+
+    //estado: PASADO
+    SwingUtilities.invokeLater(() -> iniciarInterfaz());
+    //no creamos otra partida PORQUE no queremos que reusar **partidaIntegracion** que pertenece a las pruebas
+    //no a la ejecucion final
     
     }
 
@@ -237,6 +245,23 @@ espera.await();
         SegmentoSnake cabeza = serpiente.getCuerpoSerpiente().get(0);
         System.out.println("Coord X: " + cabeza.getCoordenadasTablero().getCoorX() + "Coord Y: " 
         + cabeza.getCoordenadasTablero().getCoorY());
+    }
+
+    //metodo para INICIALIZAR la INTERFAZ
+    private static void iniciarInterfaz(){
+        TableroJuego tableroInterfaz = new TableroJuego(20, 20);
+        List<SegmentoSnake> cuerpoInterfaz  = new ArrayList<>();
+        cuerpoInterfaz.add(new SegmentoSnake(new CoordenadasTablero(5, 5)));
+        cuerpoInterfaz.add(new SegmentoSnake(new CoordenadasTablero(4, 5)));
+        cuerpoInterfaz.add(new SegmentoSnake(new CoordenadasTablero(3, 5)));
+        SerpienteSnake serpienteInterfaz = new SerpienteSnake(cuerpoInterfaz, SentidoMovimiento.DERECHA);
+        PartidaSnake partidaInterfaz = new PartidaSnake(tableroInterfaz, serpienteInterfaz);
+        MotorJuego motorInterfaz = new MotorJuego(partidaInterfaz);
+        VentanaPrincipal ventana = new VentanaPrincipal(partidaInterfaz, motorInterfaz);
+
+        ventana.setVisible(true);
+
+
     }
 
 }

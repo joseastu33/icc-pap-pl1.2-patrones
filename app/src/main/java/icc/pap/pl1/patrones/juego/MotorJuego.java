@@ -26,12 +26,18 @@ public class MotorJuego {
                 partidaSnake.moverSerpiente();
             //a partir de AQUI el movimiento de la serpiente
             //es ejecutado
-                int intervalo = partida.obtenerIntervaloMovimiento();
-                if(intervalo != ultimoIntervalo){
-                    System.out.println("Intervalo aplicado en MOTORJUEGO: " + intervalo + "ms");
-                    ultimoIntervalo = intervalo;
-                }
-                temporizador.setDelay(intervalo);
+            //se comprueba si la partida terminó durante el MOVIMIENTO
+            if(!partida.estaJugando()){
+                temporizador.stop();
+                System.out.println("MOTOR DETENIDO: Partida TERMINADA");
+                return;
+            }
+            int intervalo = partida.obtenerIntervaloMovimiento();
+            if(intervalo != ultimoIntervalo){
+                System.out.println("Intervalo aplicado en MOTORJUEGO: " + intervalo + "ms");
+                ultimoIntervalo = intervalo;
+            }
+            temporizador.setDelay(intervalo);
             }
 
         });

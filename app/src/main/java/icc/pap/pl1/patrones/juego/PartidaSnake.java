@@ -88,6 +88,7 @@ public class PartidaSnake implements SujetoJuego{
 
     public void terminarJuego(){
         estadoActual.terminarJuego();
+        System.out.println("COLISION | Estado actual: "+ estadoActual.getClass().getSimpleName());
     }
     //la interfaz permite solicitar OPERACIOENS pero NO CONOCE EL ESTADO
     public boolean estaJugando(){
@@ -97,12 +98,24 @@ public class PartidaSnake implements SujetoJuego{
         //gestorEfectos.actualizar(180, estaJugando()); //los efectos disminuyen mientras
         //mientras la PARTIDA está en CURSO: SE DETIENEN cuando está PAUSADA
         CoordenadasTablero siguientePosicion = serpienteSnake.calcularSiguientePosicion();
+
+         System.out.println(
+        "Cabeza siguiente: X=" + siguientePosicion.getCoorX()
+        + ", Y=" + siguientePosicion.getCoorY()
+        + " | Columnas=" + tableroJuego.getColumnas()
+        + " | Filas=" + tableroJuego.getFilas());
+
         boolean serpienteCome = comidaSnake != null 
         && siguientePosicion.getCoorX() == comidaSnake.getCoordenadasTablero().getCoorX() 
         && siguientePosicion.getCoorY() == comidaSnake.getCoordenadasTablero().getCoorY();
         //si come = true, la cabeza alcanzará a comer en el PROXIMO MOVIMIENTO
         if(fueraDelTablero(siguientePosicion) || chocaConCuerpo(siguientePosicion, serpienteCome)){
             terminarJuego();
+            System.out.println(
+            "PRUEBA | Cabeza después de colisión: "
+            + serpienteSnake.getCuerpoSerpiente().get(0).getCoordenadasTablero().getCoorX()
+            + ", "
+            + serpienteSnake.getCuerpoSerpiente().get(0).getCoordenadasTablero().getCoorY());
             return;
         }
         int cantidadCrecimiento = 0;
@@ -115,7 +128,11 @@ public class PartidaSnake implements SujetoJuego{
         if(serpienteCome){
             puntuacion += gestorEfectos.obtenerReglas().calcularPuntos();
         }
+        System.out.println("MOVIMIENTO | Estado: " + estadoActual.getClass().getSimpleName()
+        + " | Siguiente X: " + siguientePosicion.getCoorX()
+        + " | Siguiente Y: " + siguientePosicion.getCoorY());
         serpienteSnake.desplazarSegmentos(cantidadCrecimiento);
+        notificarObservadores(crearEstadoVista());
         if(serpienteCome){
             //antes de generar la COMIDA, tiene que ACTIVARSE su EFECTO
             gestorEfectos.activar(comidaSnake.getTipoComidaSnake());
@@ -194,6 +211,17 @@ public class PartidaSnake implements SujetoJuego{
 
     public int obtenerIntervaloMovimiento(){
         return gestorEfectos.obtenerReglas().obtenerIntervaloMovimiento();
+    }
+
+    public SerpienteSnake getSerpienteSnake(){
+        return serpienteSnake;
+    }
+
+    public ComidaSnake getComidaSnake(){
+        return comidaSnake;
+    }
+    public TableroJuego getTableroJuego(){
+        return tableroJuego;
     }
     
 }

@@ -23,6 +23,28 @@ public class SerpienteSnake {
     public SentidoMovimiento getSentidoMovimiento() {
         return sentidoMovimiento;
     }
+
+    public void cambiarSentidoMovimiento(SentidoMovimiento nuevoSentido) {
+    if (nuevoSentido == null) {
+        return;
+    }
+    //de acuerdo con el nuevo sentido pasado como parametro se va a cambiar
+    if (sentidoMovimiento == SentidoMovimiento.DERECHA && nuevoSentido == SentidoMovimiento.IZQUIERDA) {
+        return;
+    }
+    if (sentidoMovimiento == SentidoMovimiento.IZQUIERDA && nuevoSentido == SentidoMovimiento.DERECHA) {
+        return;
+    }
+    if (sentidoMovimiento == SentidoMovimiento.ARRIBA && nuevoSentido == SentidoMovimiento.ABAJO) {
+        return;
+    }
+    if (sentidoMovimiento == SentidoMovimiento.ABAJO && nuevoSentido == SentidoMovimiento.ARRIBA) {
+        return;
+    }
+    sentidoMovimiento = nuevoSentido;
+    }
+
+
     //cuando la cabeza esté EN UNA POSICION:
     //calcular la siguiente
     public CoordenadasTablero calcularSiguientePosicion(){
