@@ -2,18 +2,13 @@
 package icc.pap.pl1.patrones.vista;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 
 public class PanelComida extends JPanel {
 
-    private final JComboBox<String> comboTipoComida = new JComboBox<>(
-    new String[] {
-        "Normal",
-        "Puntuación doble",
-        "Velocidad",
-        "Crecimiento"
-    }
-);
+    private final JComboBox<String> comboTipoComida;
     private final JSpinner spinnerX;
     private final JSpinner spinnerY;
 
@@ -22,192 +17,123 @@ public class PanelComida extends JPanel {
 
     private final Color PANEL = new Color(30, 35, 85);
     private final Color TEXTO = Color.WHITE;
+    private final Color MORADO = new Color(135, 100, 230);
 
     public PanelComida() {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBackground(PANEL);
 
-        setBorder(
-                BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(
-                                new Color(120, 110, 220), 2
-                        ),
-                        BorderFactory.createEmptyBorder(
-                                20, 15, 20, 15
-                        )
-                )
-        );
+        setBorder(BorderFactory.createCompoundBorder(
+            new LineBorder(MORADO, 2),
+            new EmptyBorder(20, 15, 20, 15)
+        ));
 
-        // TÍTULO
-        JLabel titulo = new JLabel("Generar comida");
+        // Título
+        JLabel titulo = new JLabel("GENERAR COMIDA");
         titulo.setForeground(TEXTO);
         titulo.setFont(new Font("Arial", Font.BOLD, 20));
-        titulo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         add(titulo);
-        add(Box.createVerticalStrut(30));
+        add(Box.createVerticalStrut(25));
 
-        // TIPO DE COMIDA
-        JLabel etiquetaTipo = new JLabel("Tipo de comida");
+        // Selector del tipo de comida
+        JLabel etiquetaTipo = new JLabel("Tipo de comida:");
         etiquetaTipo.setForeground(TEXTO);
-        etiquetaTipo.setFont(new Font("Arial", Font.BOLD, 16));
         etiquetaTipo.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         add(etiquetaTipo);
-        add(Box.createVerticalStrut(12));
+        add(Box.createVerticalStrut(8));
 
-        comboTipoComida = new JComboBox<>(
-                new String[]{
-                        "Normal",
-                        "Puntuación doble",
-                        "Velocidad"
-                }
-        );
-
-        comboTipoComida.setFont(
-                new Font("Arial", Font.PLAIN, 15)
-        );
+        comboTipoComida = new JComboBox<>(new String[] {
+            "Normal",
+            "Puntuación doble",
+            "Velocidad",
+            "Crecimiento"
+        });
 
         comboTipoComida.setMaximumSize(
-                new Dimension(Integer.MAX_VALUE, 40)
+            new Dimension(Integer.MAX_VALUE, 35)
         );
-
-        comboTipoComida.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         add(comboTipoComida);
-        add(Box.createVerticalStrut(30));
+        add(Box.createVerticalStrut(25));
 
-        // COORDENADAS MANUALES
-        JLabel etiquetaCoordenadas =
-                new JLabel("Coordenadas manuales");
-
+        // Coordenadas
+        JLabel etiquetaCoordenadas = new JLabel("Coordenadas:");
         etiquetaCoordenadas.setForeground(TEXTO);
-        etiquetaCoordenadas.setFont(
-                new Font("Arial", Font.BOLD, 16)
-        );
-
         etiquetaCoordenadas.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         add(etiquetaCoordenadas);
-        add(Box.createVerticalStrut(12));
+        add(Box.createVerticalStrut(10));
 
-        // PANEL HORIZONTAL PARA X E Y
-        JPanel panelCoordenadas = new JPanel(
-                new GridLayout(1, 4, 8, 0)
-        );
-
-        panelCoordenadas.setBackground(PANEL);
-
-        JLabel etiquetaX = new JLabel("X:");
-        JLabel etiquetaY = new JLabel("Y:");
-
-        etiquetaX.setForeground(TEXTO);
-        etiquetaY.setForeground(TEXTO);
-
-        etiquetaX.setFont(new Font("Arial", Font.BOLD, 15));
-        etiquetaY.setFont(new Font("Arial", Font.BOLD, 15));
-
-        // El tablero tiene 14 columnas y 11 filas
+        // Valores X y Y
         spinnerX = new JSpinner(
-                new SpinnerNumberModel(5, 0, 13, 1)
+            new SpinnerNumberModel(5, 0, 13, 1)
         );
 
         spinnerY = new JSpinner(
-                new SpinnerNumberModel(5, 0, 10, 1)
+            new SpinnerNumberModel(5, 0, 10, 1)
         );
 
-        Dimension tamanoSpinner = new Dimension(75, 35);
+        JPanel panelCoordenadas = new JPanel(new GridLayout(1, 4, 8, 0));
+        panelCoordenadas.setBackground(PANEL);
 
-        spinnerX.setPreferredSize(tamanoSpinner);
-        spinnerY.setPreferredSize(tamanoSpinner);
+        JLabel etiquetaX = new JLabel("X:");
+        etiquetaX.setForeground(TEXTO);
 
-        spinnerX.setFont(new Font("Arial", Font.BOLD, 15));
-        spinnerY.setFont(new Font("Arial", Font.BOLD, 15));
+        JLabel etiquetaY = new JLabel("Y:");
+        etiquetaY.setForeground(TEXTO);
 
         panelCoordenadas.add(etiquetaX);
         panelCoordenadas.add(spinnerX);
         panelCoordenadas.add(etiquetaY);
         panelCoordenadas.add(spinnerY);
 
-        panelCoordenadas.setPreferredSize(
-                new Dimension(280, 45)
-        );
-
         panelCoordenadas.setMaximumSize(
-                new Dimension(Integer.MAX_VALUE, 45)
+            new Dimension(Integer.MAX_VALUE, 40)
         );
-
-        panelCoordenadas.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         add(panelCoordenadas);
-        add(Box.createVerticalStrut(30));
+        add(Box.createVerticalStrut(25));
 
-        // BOTÓN UBICAR COMIDA
+        // Botón para ubicar comida manualmente
         botonUbicar = new JButton("Ubicar comida");
-
-        botonUbicar.setBackground(new Color(30, 110, 240));
-        botonUbicar.setForeground(Color.WHITE);
-
-        botonUbicar.setFont(
-                new Font("Arial", Font.BOLD, 16)
-        );
-
-        botonUbicar.setFocusPainted(false);
-
+        botonUbicar.setAlignmentX(Component.CENTER_ALIGNMENT);
         botonUbicar.setMaximumSize(
-                new Dimension(Integer.MAX_VALUE, 50)
+            new Dimension(Integer.MAX_VALUE, 40)
         );
-
-        botonUbicar.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         add(botonUbicar);
         add(Box.createVerticalStrut(15));
 
-        // BOTÓN GENERAR ALEATORIA
+        // Botón para generar comida aleatoria
         botonAleatorio = new JButton("Generar aleatoria");
-
-        botonAleatorio.setBackground(
-                new Color(130, 50, 220)
-        );
-
-        botonAleatorio.setForeground(Color.WHITE);
-
-        botonAleatorio.setFont(
-                new Font("Arial", Font.BOLD, 16)
-        );
-
-        botonAleatorio.setFocusPainted(false);
-
+        botonAleatorio.setAlignmentX(Component.CENTER_ALIGNMENT);
         botonAleatorio.setMaximumSize(
-                new Dimension(Integer.MAX_VALUE, 50)
+            new Dimension(Integer.MAX_VALUE, 40)
         );
-
-        botonAleatorio.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         add(botonAleatorio);
-        add(Box.createVerticalStrut(30));
+        add(Box.createVerticalStrut(25));
 
-        // INFORMACIÓN
+        // Información
         JLabel informacion = new JLabel(
-                "<html>Ubica la comida en una casilla libre "
-                + "del tablero o genera una posición aleatoria.</html>"
+            "<html><center>"
+            + "Selecciona el tipo de comida<br>"
+            + "y las coordenadas para ubicarla."
+            + "</center></html>"
         );
 
-        informacion.setForeground(
-                new Color(200, 210, 230)
-        );
-
-        informacion.setFont(
-                new Font("Arial", Font.PLAIN, 14)
-        );
-
-        informacion.setAlignmentX(Component.LEFT_ALIGNMENT);
+        informacion.setForeground(TEXTO);
+        informacion.setFont(new Font("Arial", Font.PLAIN, 12));
+        informacion.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         add(informacion);
     }
 
-    // GETTERS
+    // Getters de los botones
 
     public JButton getBotonUbicar() {
         return botonUbicar;
@@ -217,6 +143,8 @@ public class PanelComida extends JPanel {
         return botonAleatorio;
     }
 
+    // Getters de las coordenadas
+
     public int getCoordenadaX() {
         return (int) spinnerX.getValue();
     }
@@ -225,8 +153,9 @@ public class PanelComida extends JPanel {
         return (int) spinnerY.getValue();
     }
 
+    // Getter del tipo seleccionado
+
     public String getTipoComidaSeleccionado() {
         return (String) comboTipoComida.getSelectedItem();
     }
-    
 }
