@@ -3,13 +3,14 @@ package icc.pap.pl1.patrones.vista;
 
 import javax.swing.*;
 import java.awt.*;
-import icc.pap.pl1.patrones.observer.ObservadorJuego;
-import icc.pap.pl1.patrones.observer.EstadoJuegoVista;
+
 import icc.pap.pl1.patrones.modelo.TipoComidaSnake;
 import icc.pap.pl1.patrones.juego.MotorJuego;
 import icc.pap.pl1.patrones.juego.PartidaSnake;
+import icc.pap.pl1.patrones.observer.ObservadorJuego;
+import icc.pap.pl1.patrones.observer.EstadoJuegoVista;
 
-public class VentanaPrincipal extends JFrame {
+public class VentanaPrincipal extends JFrame implements ObservadorJuego {
 
     private final PartidaSnake partidaSnake;
     private final MotorJuego motorJuego;
@@ -17,6 +18,8 @@ public class VentanaPrincipal extends JFrame {
     private final PanelControles panelControles;
     private final PanelMarcador panelMarcador;
     private final PanelComida panelComida;
+
+    private JLabel etiquetaEstado;
 
     private final Color FONDO = new Color(15, 20, 55);
     private final Color PANEL = new Color(30, 35, 85);
@@ -51,6 +54,9 @@ public class VentanaPrincipal extends JFrame {
 
         // ENCABEZADO
         principal.add(crearEncabezado(), BorderLayout.NORTH);
+
+        // Registrar VentanaPrincipal como observador
+        partidaSnake.agregarObservador(this);
 
         // CONTENEDOR DE LAS TRES COLUMNAS
         JPanel contenido = new JPanel(new GridBagLayout());
@@ -128,18 +134,19 @@ public class VentanaPrincipal extends JFrame {
                 new Font("Arial", Font.BOLD, 30)
         );
 
-        JLabel estado = new JLabel("Estado: PREPARADO");
+        // Etiqueta dinámica del estado
+        etiquetaEstado = new JLabel("Estado: PREPARADO");
 
-        estado.setForeground(
+        etiquetaEstado.setForeground(
                 new Color(170, 255, 120)
         );
 
-        estado.setFont(
+        etiquetaEstado.setFont(
                 new Font("Arial", Font.BOLD, 20)
         );
 
         encabezado.add(titulo, BorderLayout.WEST);
-        encabezado.add(estado, BorderLayout.EAST);
+        encabezado.add(etiquetaEstado, BorderLayout.EAST);
 
         return encabezado;
     }
@@ -261,6 +268,41 @@ public class VentanaPrincipal extends JFrame {
                         this,
                         "No hay espacio disponible para generar comida."
                 );
+            }
+        });
+    }
+
+    // OBSERVER: ACTUALIZAR EL ESTADO DEL ENCABEZADO
+    @Override
+    public void actualizar(EstadoJuegoVista estado) {
+
+        SwingUtilities.invokeLater(() -> {
+
+            String estadoActual = estado.getEstado();
+
+            if (estadoActual.equals("EstadoPreparado")) {
+
+                etiquetaEstado.setText("Estado: PREPARADO");
+                etiquetaEstado.setForeground(
+                        new Color(170, 255, 120)
+                );
+
+            } else if (estadoActual.equals("EstadoJugando")) {
+
+                etiquetaEstado.setText("Estado: JUGANDO");
+                etiquetaEstado.setForeground(
+                        new Color(170, 255, 120)
+                );
+
+            } else if (estadoActual.equals("EstadoPausado")) {
+
+                etiquetaEstado.setText("Estado: PAUSADO");
+                etiquetaEstado.setForeground(Color.YELLOW);
+
+            } else if (estadoActual.equals("EstadoTerminado")) {
+
+                etiquetaEstado.setText("Estado: TERMINADO");
+                etiquetaEstado.setForeground(Color.RED);
             }
         });
     }
