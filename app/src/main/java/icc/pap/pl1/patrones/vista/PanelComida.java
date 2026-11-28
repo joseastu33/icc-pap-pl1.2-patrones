@@ -1,25 +1,32 @@
-
 package icc.pap.pl1.patrones.vista;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class PanelComida extends JPanel {
 
-    private final JComboBox<String> comboTipoComida;
     private final JSpinner spinnerX;
     private final JSpinner spinnerY;
 
     private final JButton botonUbicar;
     private final JButton botonAleatorio;
 
+    private String tipoComidaSeleccionado = "Normal";
+
     private final Color PANEL = new Color(30, 35, 85);
     private final Color TEXTO = Color.WHITE;
     private final Color MORADO = new Color(135, 100, 230);
+
+    private final Color VERDE = new Color(20, 190, 75);
+    private final Color MORADO_DOBLE = new Color(170, 70, 230);
+    private final Color AZUL = new Color(25, 105, 245);
+    private final Color AMARILLO = new Color(245, 175, 0);
+
+    private BotonRedondeado botonNormal;
+    private BotonRedondeado botonDoble;
+    private BotonRedondeado botonVelocidad;
+    private BotonRedondeado botonCrecimiento;
 
     public PanelComida() {
 
@@ -27,62 +34,82 @@ public class PanelComida extends JPanel {
         setBackground(PANEL);
 
         setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(MORADO, 2),
-                new EmptyBorder(20, 15, 20, 15)
+                BorderFactory.createLineBorder(MORADO, 2),
+                new EmptyBorder(15, 15, 15, 15)
         ));
 
-        // TITULO
+        // TÍTULO
         JLabel titulo = new JLabel("GENERAR COMIDA");
-
         titulo.setForeground(TEXTO);
         titulo.setFont(new Font("Arial", Font.BOLD, 20));
         titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         add(titulo);
-        add(Box.createVerticalStrut(30));
+        add(Box.createVerticalStrut(20));
 
         // TIPO DE COMIDA
-        JLabel etiquetaTipo = crearEtiqueta("Tipo de comida:");
+        JLabel etiquetaTipo = new JLabel("Tipo de comida:");
+        etiquetaTipo.setForeground(TEXTO);
+        etiquetaTipo.setFont(new Font("Arial", Font.BOLD, 14));
         etiquetaTipo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         add(etiquetaTipo);
         add(Box.createVerticalStrut(10));
 
-        comboTipoComida = new JComboBox<>(new String[]{
-                "Normal",
-                "Puntuación doble",
-                "Velocidad",
-                "Crecimiento"
-        });
+        // PANEL DE BOTONES DE COMIDA
+        JPanel panelTipos = new JPanel(new GridLayout(4, 1, 0, 10));
+        panelTipos.setBackground(PANEL);
 
-        comboTipoComida.setFont(new Font("Arial", Font.PLAIN, 14));
-        comboTipoComida.setMaximumSize(
-                new Dimension(Integer.MAX_VALUE, 38)
+        botonNormal = new BotonRedondeado(
+                "●  Normal",
+                VERDE
         );
 
-        comboTipoComida.setAlignmentX(Component.CENTER_ALIGNMENT);
+        botonDoble = new BotonRedondeado(
+                "●  Puntuación doble",
+                MORADO_DOBLE
+        );
 
-        add(comboTipoComida);
-        add(Box.createVerticalStrut(30));
+        botonVelocidad = new BotonRedondeado(
+                "●  Velocidad",
+                AZUL
+        );
+
+        botonCrecimiento = new BotonRedondeado(
+                "●  Crecimiento",
+                AMARILLO
+        );
+
+        panelTipos.add(botonNormal);
+        panelTipos.add(botonDoble);
+        panelTipos.add(botonVelocidad);
+        panelTipos.add(botonCrecimiento);
+
+        panelTipos.setMaximumSize(
+                new Dimension(Integer.MAX_VALUE, 210)
+        );
+
+        add(panelTipos);
+        add(Box.createVerticalStrut(20));
 
         // COORDENADAS
-        JLabel etiquetaCoordenadas = crearEtiqueta("Coordenadas:");
-
+        JLabel etiquetaCoordenadas = new JLabel("Coordenadas:");
+        etiquetaCoordenadas.setForeground(TEXTO);
+        etiquetaCoordenadas.setFont(new Font("Arial", Font.BOLD, 14));
         etiquetaCoordenadas.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         add(etiquetaCoordenadas);
-        add(Box.createVerticalStrut(12));
+        add(Box.createVerticalStrut(10));
 
+        // SPINNER X
         spinnerX = new JSpinner(
                 new SpinnerNumberModel(5, 0, 13, 1)
         );
 
+        // SPINNER Y
         spinnerY = new JSpinner(
                 new SpinnerNumberModel(5, 0, 10, 1)
         );
-
-        configurarSpinner(spinnerX);
-        configurarSpinner(spinnerY);
 
         JPanel panelCoordenadas = new JPanel(
                 new GridLayout(1, 4, 8, 0)
@@ -90,8 +117,13 @@ public class PanelComida extends JPanel {
 
         panelCoordenadas.setBackground(PANEL);
 
-        JLabel etiquetaX = crearEtiqueta("X:");
-        JLabel etiquetaY = crearEtiqueta("Y:");
+        JLabel etiquetaX = new JLabel("X:");
+        etiquetaX.setForeground(TEXTO);
+        etiquetaX.setFont(new Font("Arial", Font.BOLD, 14));
+
+        JLabel etiquetaY = new JLabel("Y:");
+        etiquetaY.setForeground(TEXTO);
+        etiquetaY.setFont(new Font("Arial", Font.BOLD, 14));
 
         panelCoordenadas.add(etiquetaX);
         panelCoordenadas.add(spinnerX);
@@ -102,37 +134,33 @@ public class PanelComida extends JPanel {
                 new Dimension(Integer.MAX_VALUE, 40)
         );
 
-        panelCoordenadas.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         add(panelCoordenadas);
-        add(Box.createVerticalStrut(25));
+        add(Box.createVerticalStrut(20));
 
-        // BOTON UBICAR
-        botonUbicar = crearBoton(
-                "Ubicar comida",
-                new Color(45, 130, 255),
-                new Color(20, 80, 220)
+        // BOTÓN UBICAR COMIDA
+        botonUbicar = crearBotonAccion(
+                " Ubicar comida",
+                new Color(30, 120, 255)
         );
 
         add(botonUbicar);
-        add(Box.createVerticalStrut(15));
+        add(Box.createVerticalStrut(12));
 
-        // BOTON ALEATORIO
-        botonAleatorio = crearBoton(
-                "Generar aleatoria",
-                new Color(155, 65, 245),
-                new Color(105, 35, 200)
+        // BOTÓN GENERAR ALEATORIA
+        botonAleatorio = crearBotonAccion(
+                " Generar aleatoria",
+                new Color(145, 45, 230)
         );
 
         add(botonAleatorio);
-        add(Box.createVerticalStrut(25));
+        add(Box.createVerticalStrut(20));
 
-        // INFORMACION
+        // INFORMACIÓN
         JLabel informacion = new JLabel(
                 "<html><center>"
-                + "Ubica comida en una casilla libre<br>"
-                + "del tablero o genera una posición aleatoria."
-                + "</center></html>"
+                        + "Ubica la comida en una casilla libre<br>"
+                        + "del tablero o genera una posición aleatoria."
+                        + "</center></html>"
         );
 
         informacion.setForeground(TEXTO);
@@ -140,141 +168,85 @@ public class PanelComida extends JPanel {
         informacion.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         add(informacion);
+
+        // CONFIGURAR SELECCIÓN
+        configurarSeleccion();
+        actualizarBotonesTipo();
     }
 
-    // CREAR ETIQUETAS
-    private JLabel crearEtiqueta(String texto) {
+    // SELECCIÓN DE TIPO DE COMIDA
 
-        JLabel etiqueta = new JLabel(texto);
+    private void configurarSeleccion() {
 
-        etiqueta.setForeground(TEXTO);
-        etiqueta.setFont(new Font("Arial", Font.BOLD, 14));
+        botonNormal.addActionListener(e -> {
+            tipoComidaSeleccionado = "Normal";
+            actualizarBotonesTipo();
+        });
 
-        return etiqueta;
+        botonDoble.addActionListener(e -> {
+            tipoComidaSeleccionado = "Puntuación doble";
+            actualizarBotonesTipo();
+        });
+
+        botonVelocidad.addActionListener(e -> {
+            tipoComidaSeleccionado = "Velocidad";
+            actualizarBotonesTipo();
+        });
+
+        botonCrecimiento.addActionListener(e -> {
+            tipoComidaSeleccionado = "Crecimiento";
+            actualizarBotonesTipo();
+        });
     }
 
-    // ESTILO DE LOS SPINNERS
-    private void configurarSpinner(JSpinner spinner) {
+    private void actualizarBotonesTipo() {
 
-        spinner.setFont(new Font("Arial", Font.BOLD, 14));
-
-        spinner.setPreferredSize(
-                new Dimension(65, 38)
+        botonNormal.setSeleccionado(
+                tipoComidaSeleccionado.equals("Normal")
         );
 
-        spinner.setMaximumSize(
-                new Dimension(65, 38)
+        botonDoble.setSeleccionado(
+                tipoComidaSeleccionado.equals("Puntuación doble")
+        );
+
+        botonVelocidad.setSeleccionado(
+                tipoComidaSeleccionado.equals("Velocidad")
+        );
+
+        botonCrecimiento.setSeleccionado(
+                tipoComidaSeleccionado.equals("Crecimiento")
         );
     }
 
-    // CREAR BOTONES CON DEGRADADO
-    private JButton crearBoton(
-            String texto,
-            Color colorSuperior,
-            Color colorInferior) {
+    // CREAR BOTONES DE ACCIÓN
 
-        JButton boton = new JButton(texto) {
+    private JButton crearBotonAccion(String texto, Color color) {
 
-            private boolean mouseEncima = false;
+        JButton boton = new JButton(texto);
 
-            {
-                setContentAreaFilled(false);
-                setFocusPainted(false);
-                setBorderPainted(false);
-                setOpaque(false);
+        boton.setFont(new Font("Arial", Font.BOLD, 15));
+        boton.setForeground(Color.WHITE);
+        boton.setBackground(color);
 
-                setForeground(Color.WHITE);
-                setFont(new Font("Arial", Font.BOLD, 15));
+        boton.setFocusPainted(false);
 
-                setCursor(
-                        new Cursor(Cursor.HAND_CURSOR)
-                );
-
-                addMouseListener(new MouseAdapter() {
-
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
-                        mouseEncima = true;
-                        repaint();
-                    }
-
-                    @Override
-                    public void mouseExited(MouseEvent e) {
-                        mouseEncima = false;
-                        repaint();
-                    }
-                });
-            }
-
-            @Override
-            protected void paintComponent(Graphics g) {
-
-                Graphics2D g2 = (Graphics2D) g.create();
-
-                g2.setRenderingHint(
-                        RenderingHints.KEY_ANTIALIASING,
-                        RenderingHints.VALUE_ANTIALIAS_ON
-                );
-
-                Color superior = colorSuperior;
-                Color inferior = colorInferior;
-
-                if (mouseEncima) {
-                    superior = superior.brighter();
-                    inferior = inferior.brighter();
-                }
-
-                GradientPaint degradado = new GradientPaint(
-                        0, 0,
-                        superior,
-                        0, getHeight(),
-                        inferior
-                );
-
-                g2.setPaint(degradado);
-
-                g2.fillRoundRect(
-                        0,
-                        0,
-                        getWidth() - 1,
-                        getHeight() - 1,
-                        20,
-                        20
-                );
-
-                // BORDE
-                g2.setColor(superior.brighter());
-                g2.setStroke(new BasicStroke(2));
-
-                g2.drawRoundRect(
-                        1,
-                        1,
-                        getWidth() - 3,
-                        getHeight() - 3,
-                        20,
-                        20
-                );
-
-                g2.dispose();
-
-                super.paintComponent(g);
-            }
-        };
-
-        boton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(color.brighter(), 2),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
 
         boton.setMaximumSize(
-                new Dimension(Integer.MAX_VALUE, 48)
+                new Dimension(Integer.MAX_VALUE, 50)
         );
 
-        boton.setPreferredSize(
-                new Dimension(220, 48)
-        );
+        boton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         return boton;
     }
 
-    // GETTERS DE LOS BOTONES
+    // GETTERS
+
     public JButton getBotonUbicar() {
         return botonUbicar;
     }
@@ -283,7 +255,6 @@ public class PanelComida extends JPanel {
         return botonAleatorio;
     }
 
-    // GETTERS DE COORDENADAS
     public int getCoordenadaX() {
         return (int) spinnerX.getValue();
     }
@@ -292,8 +263,92 @@ public class PanelComida extends JPanel {
         return (int) spinnerY.getValue();
     }
 
-    // GETTER DEL TIPO DE COMIDA
     public String getTipoComidaSeleccionado() {
-        return (String) comboTipoComida.getSelectedItem();
+        return tipoComidaSeleccionado;
+    }
+
+    // BOTÓN REDONDEADO PERSONALIZADO
+
+    private class BotonRedondeado extends JButton {
+
+        private final Color color;
+        private boolean seleccionado;
+
+        public BotonRedondeado(String texto, Color color) {
+
+            super(texto);
+
+            this.color = color;
+
+            setFont(new Font("Arial", Font.BOLD, 16));
+            setForeground(Color.WHITE);
+
+            setFocusPainted(false);
+            setContentAreaFilled(false);
+            setBorderPainted(false);
+            setOpaque(false);
+
+            setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+            setPreferredSize(new Dimension(200, 45));
+            setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        }
+
+        public void setSeleccionado(boolean seleccionado) {
+            this.seleccionado = seleccionado;
+            repaint();
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+
+            Graphics2D g2 = (Graphics2D) g.create();
+
+            g2.setRenderingHint(
+                    RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON
+            );
+
+            int ancho = getWidth();
+            int alto = getHeight();
+
+            // FONDO
+            if (seleccionado) {
+                g2.setColor(color);
+            } else {
+                g2.setColor(new Color(
+                        color.getRed() / 3,
+                        color.getGreen() / 3,
+                        color.getBlue() / 3
+                ));
+            }
+
+            g2.fillRoundRect(
+                    2, 2,
+                    ancho - 4, alto - 4,
+                    25, 25
+            );
+
+            // BORDE
+            g2.setStroke(new BasicStroke(
+                    seleccionado ? 3 : 2
+            ));
+
+            g2.setColor(
+                    seleccionado
+                            ? color.brighter()
+                            : color
+            );
+
+            g2.drawRoundRect(
+                    2, 2,
+                    ancho - 4, alto - 4,
+                    25, 25
+            );
+
+            g2.dispose();
+
+            super.paintComponent(g);
+        }
     }
 }

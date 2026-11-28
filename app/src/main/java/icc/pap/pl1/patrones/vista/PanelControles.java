@@ -1,10 +1,7 @@
-
 package icc.pap.pl1.patrones.vista;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class PanelControles extends JPanel {
 
@@ -13,18 +10,19 @@ public class PanelControles extends JPanel {
     private JButton botonReanudar;
     private JButton botonReiniciar;
 
-    private final Color FONDO = new Color(30, 35, 85);
-    private final Color BORDE = new Color(135, 100, 230);
-
     public PanelControles() {
 
-        setLayout(new GridLayout(5, 1, 10, 12));
-        setBackground(FONDO);
+        setLayout(new GridLayout(5, 1, 10, 10));
+        setBackground(new Color(30, 35, 85));
 
         setBorder(
                 BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(BORDE, 2),
-                        BorderFactory.createEmptyBorder(15, 15, 15, 15)
+                        BorderFactory.createLineBorder(
+                                new Color(120, 110, 220), 2
+                        ),
+                        BorderFactory.createEmptyBorder(
+                                15, 15, 15, 15
+                        )
                 )
         );
 
@@ -32,28 +30,29 @@ public class PanelControles extends JPanel {
         titulo.setForeground(Color.WHITE);
         titulo.setFont(new Font("Arial", Font.BOLD, 20));
 
+        // BOTONES
         botonIniciar = crearBoton(
                 "Iniciar",
                 new Color(20, 190, 75),
-                new Color(10, 145, 55)
+                new IconoBoton("play")
         );
 
         botonPausar = crearBoton(
                 "Pausar",
-                new Color(255, 190, 0),
-                new Color(220, 145, 0)
+                new Color(245, 175, 0),
+                new IconoBoton("pause")
         );
 
         botonReanudar = crearBoton(
                 "Reanudar",
-                new Color(40, 125, 255),
-                new Color(20, 80, 220)
+                new Color(25, 105, 245),
+                new IconoBoton("play")
         );
 
         botonReiniciar = crearBoton(
                 "Reiniciar",
-                new Color(235, 45, 100),
-                new Color(185, 20, 70)
+                new Color(220, 35, 90),
+                new IconoBoton("restart")
         );
 
         add(titulo);
@@ -63,43 +62,41 @@ public class PanelControles extends JPanel {
         add(botonReiniciar);
     }
 
+    // CREAR BOTONES REDONDEADOS
     private JButton crearBoton(
             String texto,
-            Color colorSuperior,
-            Color colorInferior) {
+            Color color,
+            Icon icono) {
 
-        JButton boton = new JButton(texto) {
+        JButton boton = new JButton(texto, icono);
 
-            private boolean mouseEncima = false;
+        boton.setFont(new Font("Arial", Font.BOLD, 19));
+        boton.setForeground(Color.WHITE);
 
-            {
-                setContentAreaFilled(false);
-                setFocusPainted(false);
-                setBorderPainted(false);
-                setOpaque(false);
+        boton.setFocusPainted(false);
+        boton.setOpaque(false);
+        boton.setContentAreaFilled(false);
 
-                setForeground(Color.WHITE);
-                setFont(new Font("Arial", Font.BOLD, 19));
-                setCursor(new Cursor(Cursor.HAND_CURSOR));
+        boton.setBorder(
+                BorderFactory.createEmptyBorder(
+                        10, 15, 10, 15
+                )
+        );
 
-                addMouseListener(new MouseAdapter() {
+        boton.setCursor(
+                new Cursor(Cursor.HAND_CURSOR)
+        );
 
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
-                        mouseEncima = true;
-                        repaint();
-                    }
+        boton.setHorizontalAlignment(SwingConstants.CENTER);
+        boton.setHorizontalTextPosition(SwingConstants.RIGHT);
+        boton.setVerticalTextPosition(SwingConstants.CENTER);
+        boton.setIconTextGap(12);
 
-                    @Override
-                    public void mouseExited(MouseEvent e) {
-                        mouseEncima = false;
-                        repaint();
-                    }
-                });
-            }
+        // PERSONALIZAR APARIENCIA DEL BOTÓN
+        boton.setUI(new javax.swing.plaf.basic.BasicButtonUI() {
 
             @Override
-            protected void paintComponent(Graphics g) {
+            public void paint(Graphics g, JComponent c) {
 
                 Graphics2D g2 = (Graphics2D) g.create();
 
@@ -108,61 +105,164 @@ public class PanelControles extends JPanel {
                         RenderingHints.VALUE_ANTIALIAS_ON
                 );
 
-                int ancho = getWidth();
-                int alto = getHeight();
+                JButton b = (JButton) c;
 
-                Color superior = colorSuperior;
-                Color inferior = colorInferior;
-
-                if (mouseEncima) {
-                    superior = superior.brighter();
-                    inferior = inferior.brighter();
-                }
-
-                // Degradado del botón
-                GradientPaint degradado = new GradientPaint(
-                        0, 0,
-                        superior,
-                        0, alto,
-                        inferior
-                );
-
-                g2.setPaint(degradado);
+                // FONDO DEL BOTÓN
+                g2.setColor(color);
 
                 g2.fillRoundRect(
                         0,
                         0,
-                        ancho - 1,
-                        alto - 1,
+                        b.getWidth(),
+                        b.getHeight(),
                         22,
                         22
                 );
 
-                // Borde iluminado
-                g2.setColor(superior.brighter());
-
+                // BORDE BRILLANTE
+                g2.setColor(color.brighter());
                 g2.setStroke(new BasicStroke(2));
 
                 g2.drawRoundRect(
                         1,
                         1,
-                        ancho - 3,
-                        alto - 3,
+                        b.getWidth() - 3,
+                        b.getHeight() - 3,
                         22,
                         22
                 );
 
                 g2.dispose();
 
-                super.paintComponent(g);
+                // DIBUJAR TEXTO E ICONO
+                super.paint(g, c);
             }
-        };
-
-        boton.setPreferredSize(new Dimension(220, 55));
+        });
 
         return boton;
     }
 
+    // ICONOS DIBUJADOS EN JAVA
+    private static class IconoBoton implements Icon {
+
+        private final String tipo;
+
+        public IconoBoton(String tipo) {
+            this.tipo = tipo;
+        }
+
+        @Override
+        public int getIconWidth() {
+            return 24;
+        }
+
+        @Override
+        public int getIconHeight() {
+            return 24;
+        }
+
+        @Override
+        public void paintIcon(
+                Component componente,
+                Graphics g,
+                int x,
+                int y) {
+
+            Graphics2D g2 = (Graphics2D) g.create();
+
+            g2.setRenderingHint(
+                    RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON
+            );
+
+            g2.setColor(Color.WHITE);
+
+            g2.setStroke(
+                    new BasicStroke(
+                            2.5f,
+                            BasicStroke.CAP_ROUND,
+                            BasicStroke.JOIN_ROUND
+                    )
+            );
+
+            // ICONO PLAY
+            if (tipo.equals("play")) {
+
+                int[] puntosX = {
+                    x + 5,
+                    x + 5,
+                    x + 20
+                };
+
+                int[] puntosY = {
+                    y + 3,
+                    y + 21,
+                    y + 12
+                };
+
+                g2.fillPolygon(
+                        puntosX,
+                        puntosY,
+                        3
+                );
+
+            // ICONO PAUSA
+            } else if (tipo.equals("pause")) {
+
+                g2.fillRoundRect(
+                        x + 5,
+                        y + 3,
+                        5,
+                        18,
+                        2,
+                        2
+                );
+
+                g2.fillRoundRect(
+                        x + 14,
+                        y + 3,
+                        5,
+                        18,
+                        2,
+                        2
+                );
+
+            // ICONO REINICIAR
+            } else if (tipo.equals("restart")) {
+
+                g2.drawArc(
+                        x + 3,
+                        y + 4,
+                        17,
+                        17,
+                        45,
+                        290
+                );
+
+                int[] puntosX = {
+                    x + 17,
+                    x + 22,
+                    x + 20
+                };
+
+                int[] puntosY = {
+                    y + 3,
+                    y + 5,
+                    y + 10
+                };
+
+                g2.fillPolygon(
+                        puntosX,
+                        puntosY,
+                        3
+                );
+            }
+
+            g2.dispose();
+        }
+    }
+
+    // GETTERS
     public JButton getBotonIniciar() {
         return botonIniciar;
     }
