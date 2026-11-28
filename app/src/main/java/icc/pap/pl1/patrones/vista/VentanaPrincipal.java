@@ -173,9 +173,18 @@ public class VentanaPrincipal extends JFrame {
                 partidaSnake.reanudarJuego();
                 motorJuego.iniciarMotorJuego();
         });
-        panelControles.getBotonReiniciar().addActionListener(e -> {
-                //implementacion despues
+        //conexion con el boton reinciar 
+       panelControles.getBotonReiniciar().addActionListener(e -> {
 
-        });
+    // Detener el temporizador
+    motorJuego.detenerMotorJuego();
+
+    // Reiniciar la partida
+    partidaSnake.reiniciarPartida();
+
+    // Actualizar el tablero
+    repaint();
+
+});
     }
 }
