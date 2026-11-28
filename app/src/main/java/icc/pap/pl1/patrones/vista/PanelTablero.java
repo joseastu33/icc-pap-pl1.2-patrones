@@ -6,47 +6,59 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
-import icc.pap.pl1.patrones.juego.PartidaSnake;
-import icc.pap.pl1.patrones.modelo.CoordenadasTablero;
-import icc.pap.pl1.patrones.modelo.SegmentoSnake;
-import icc.pap.pl1.patrones.modelo.SentidoMovimiento;
-import icc.pap.pl1.patrones.observer.EstadoJuegoVista;
-import icc.pap.pl1.patrones.observer.ObservadorJuego;
-import icc.pap.pl1.patrones.state.EstadoTerminado;
-import icc.pap.pl1.patrones.modelo.ComidaSnake;
-import icc.pap.pl1.patrones.observer.ObservadorJuego;
-import icc.pap.pl1.patrones.observer.EstadoJuegoVista;
-import icc.pap.pl1.patrones.state.EstadoTerminado;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.List;
 import java.awt.RenderingHints;
-import java.util.ArrayList;
+
+import java.util.List;
+
+import icc.pap.pl1.patrones.juego.PartidaSnake;
+import icc.pap.pl1.patrones.modelo.CoordenadasTablero;
+import icc.pap.pl1.patrones.modelo.SegmentoSnake;
+import icc.pap.pl1.patrones.modelo.SentidoMovimiento;
+import icc.pap.pl1.patrones.modelo.ComidaSnake;
+import icc.pap.pl1.patrones.observer.EstadoJuegoVista;
+import icc.pap.pl1.patrones.observer.ObservadorJuego;
+import icc.pap.pl1.patrones.state.EstadoTerminado;
 
 public class PanelTablero extends JPanel implements ObservadorJuego {
 
-    private int obtenerColumnas(){
+    private static final int TAM_CELDA = 32;
+
+    private final PartidaSnake partidaSnake;
+
+    private final Color COLOR_FONDO = new Color(8, 35, 30);
+    private final Color COLOR_CELDA = new Color(15, 75, 58);
+    private final Color COLOR_CABEZA = new Color(100, 255, 100);
+    private final Color COLOR_CUERPO = new Color(30, 180, 90);
+    private final Color COLOR_COMIDA = new Color(255, 65, 65);
+
+    public PanelTablero(PartidaSnake partidaSnake) {
+
+        this.partidaSnake = partidaSnake;
+
+        setBackground(COLOR_FONDO);
+
+        // El tamaño del tablero se mantiene fijo.
+        setPreferredSize(new Dimension(
+                obtenerColumnas() * TAM_CELDA,
+                obtenerFilas() * TAM_CELDA
+        ));
+
+        setMinimumSize(getPreferredSize());
+        setMaximumSize(getPreferredSize());
+
+        configurarControles();
+    }
+
+    private int obtenerColumnas() {
         return partidaSnake.getTableroJuego().getColumnas();
     }
 
-    private int obtenerFilas(){
+    private int obtenerFilas() {
         return partidaSnake.getTableroJuego().getFilas();
-    }
-    private static final int TAM_CELDA = 32;
-    private final PartidaSnake partidaSnake;
-
-    private int[] serpienteX = {4, 3, 2};
-    private int[] serpienteY = {5, 5, 5};
-
-    public PanelTablero(PartidaSnake partidaSnake) {
-        this.partidaSnake = partidaSnake;
-        setBackground(new Color(10, 35, 32));
-
-        setPreferredSize(new Dimension(obtenerColumnas()* TAM_CELDA,obtenerFilas()* TAM_CELDA));
-        configurarControles();
     }
 
     @Override
@@ -61,25 +73,42 @@ public class PanelTablero extends JPanel implements ObservadorJuego {
                 RenderingHints.VALUE_ANTIALIAS_ON
         );
 
-        dibujarCuadricula(g2);
-        dibujarComida(g2);
-        dibujarSerpiente(g2);
-        System.out.println("Tamaño real del PanelTablero: "+ getWidth() + " x " + getHeight());
+        // Calculamos el espacio sobrante para centrar la cuadrícula.
+        int anchoTablero = obtenerColumnas() * TAM_CELDA;
+        int altoTablero = obtenerFilas() * TAM_CELDA;
+
+        int desplazamientoX = (getWidth() - anchoTablero) / 2;
+        int desplazamientoY = (getHeight() - altoTablero) / 2;
+
+        dibujarCuadricula(g2, desplazamientoX, desplazamientoY);
+        dibujarComida(g2, desplazamientoX, desplazamientoY);
+        dibujarSerpiente(g2, desplazamientoX, desplazamientoY);
 
         g2.dispose();
-
     }
 
-    private void dibujarCuadricula(Graphics2D g2) {
+    private void dibujarCuadricula(
+            Graphics2D g2,
+            int desplazamientoX,
+            int desplazamientoY) {
+
+        g2.setColor(COLOR_FONDO);
+
+        g2.fillRect(
+                0,
+                0,
+                getWidth(),
+                getHeight()
+        );
 
         for (int fila = 0; fila < obtenerFilas(); fila++) {
 
             for (int columna = 0; columna < obtenerColumnas(); columna++) {
 
-                int x = columna * TAM_CELDA;
-                int y = fila * TAM_CELDA;
+                int x = desplazamientoX + columna * TAM_CELDA;
+                int y = desplazamientoY + fila * TAM_CELDA;
 
-                g2.setColor(new Color(15, 75, 58));
+                g2.setColor(COLOR_CELDA);
 
                 g2.fillRoundRect(
                         x + 2,
@@ -93,24 +122,35 @@ public class PanelTablero extends JPanel implements ObservadorJuego {
         }
     }
 
-    private void dibujarSerpiente(Graphics2D g2) {
-        List<SegmentoSnake> cuerpoS = partidaSnake.getSerpienteSnake().getCuerpoSerpiente();
-        
+    private void dibujarSerpiente(
+            Graphics2D g2,
+            int desplazamientoX,
+            int desplazamientoY) {
+
+        List<SegmentoSnake> cuerpoS =
+                partidaSnake.getSerpienteSnake().getCuerpoSerpiente();
+
         for (int i = 0; i < cuerpoS.size(); i++) {
-            CoordenadasTablero posicionS = cuerpoS.get(i).getCoordenadasTablero();
-            int x = posicionS.getCoorX()*TAM_CELDA;
-            int y = posicionS.getCoorY()*TAM_CELDA;
-            System.out.println("DIBUJO | Segmento " + i + " | X=" + posicionS.getCoorX()
-            + " | Y=" + posicionS.getCoorY()
-            + " | Estado=" + partidaSnake.getEstadoActual().getClass().getSimpleName());
+
+            CoordenadasTablero posicionS =
+                    cuerpoS.get(i).getCoordenadasTablero();
+
+            int x = desplazamientoX
+                    + posicionS.getCoorX() * TAM_CELDA;
+
+            int y = desplazamientoY
+                    + posicionS.getCoorY() * TAM_CELDA;
+
             if (i == 0) {
-                if(partidaSnake.getEstadoActual() instanceof EstadoTerminado){
+
+                if (partidaSnake.getEstadoActual() instanceof EstadoTerminado) {
                     g2.setColor(Color.RED);
                 } else {
-                    g2.setColor(new Color(100, 255, 100));
+                    g2.setColor(COLOR_CABEZA);
                 }
+
             } else {
-                g2.setColor(new Color(30, 180, 90));
+                g2.setColor(COLOR_CUERPO);
             }
 
             g2.fillRoundRect(
@@ -124,17 +164,27 @@ public class PanelTablero extends JPanel implements ObservadorJuego {
         }
     }
 
-    private void dibujarComida(Graphics2D g2) {
+    private void dibujarComida(
+            Graphics2D g2,
+            int desplazamientoX,
+            int desplazamientoY) {
 
         ComidaSnake comidaSn = partidaSnake.getComidaSnake();
-        if(comidaSn == null){
+
+        if (comidaSn == null) {
             return;
         }
-        CoordenadasTablero pos = comidaSn.getCoordenadasTablero();
-        int x = pos.getCoorX() * TAM_CELDA;
-        int y = pos.getCoorY() * TAM_CELDA;
 
-        g2.setColor(new Color(255, 65, 65));
+        CoordenadasTablero pos =
+                comidaSn.getCoordenadasTablero();
+
+        int x = desplazamientoX
+                + pos.getCoorX() * TAM_CELDA;
+
+        int y = desplazamientoY
+                + pos.getCoorY() * TAM_CELDA;
+
+        g2.setColor(COLOR_COMIDA);
 
         g2.fillRoundRect(
                 x + 3,
@@ -148,48 +198,61 @@ public class PanelTablero extends JPanel implements ObservadorJuego {
 
     @Override
     public void actualizar(EstadoJuegoVista estado) {
-         System.out.println(
-        "PANEL TABLERO | Recibió actualización: " + estado
-    );
         repaint();
     }
 
     private void configurarControles() {
-    getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-            KeyStroke.getKeyStroke("UP"), "arriba"); //asocia el teclado con accion de ir ARRIBA
-    getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-            KeyStroke.getKeyStroke("DOWN"), "abajo"); //asocia el teclado con accion de ir ABAJO
-    getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-            KeyStroke.getKeyStroke("LEFT"), "izquierda");
-    getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-            KeyStroke.getKeyStroke("RIGHT"), "derecha");
-    getActionMap().put("arriba", new AbstractAction() {
-        @Override
-        public void actionPerformed(java.awt.event.ActionEvent e) {
-            partidaSnake.getSerpienteSnake()
-                    .cambiarSentidoMovimiento(SentidoMovimiento.ARRIBA);
-        }
-    });
-    getActionMap().put("abajo", new AbstractAction() {
-        @Override
-        public void actionPerformed(java.awt.event.ActionEvent e) {
-            partidaSnake.getSerpienteSnake()
-                    .cambiarSentidoMovimiento(SentidoMovimiento.ABAJO);
-        }
-    });
-    getActionMap().put("izquierda", new AbstractAction() {
-        @Override
-        public void actionPerformed(java.awt.event.ActionEvent e) {
-            partidaSnake.getSerpienteSnake()
-                    .cambiarSentidoMovimiento(SentidoMovimiento.IZQUIERDA);
-        }
-    });
-    getActionMap().put("derecha", new AbstractAction() {
-        @Override
-        public void actionPerformed(java.awt.event.ActionEvent e) {
-            partidaSnake.getSerpienteSnake()
-                    .cambiarSentidoMovimiento(SentidoMovimiento.DERECHA);
-        }
-    });
+
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke("UP"),
+                "arriba"
+        );
+
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke("DOWN"),
+                "abajo"
+        );
+
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke("LEFT"),
+                "izquierda"
+        );
+
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke("RIGHT"),
+                "derecha"
+        );
+
+        getActionMap().put("arriba", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                partidaSnake.getSerpienteSnake()
+                        .cambiarSentidoMovimiento(SentidoMovimiento.ARRIBA);
+            }
+        });
+
+        getActionMap().put("abajo", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                partidaSnake.getSerpienteSnake()
+                        .cambiarSentidoMovimiento(SentidoMovimiento.ABAJO);
+            }
+        });
+
+        getActionMap().put("izquierda", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                partidaSnake.getSerpienteSnake()
+                        .cambiarSentidoMovimiento(SentidoMovimiento.IZQUIERDA);
+            }
+        });
+
+        getActionMap().put("derecha", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                partidaSnake.getSerpienteSnake()
+                        .cambiarSentidoMovimiento(SentidoMovimiento.DERECHA);
+            }
+        });
     }
 }

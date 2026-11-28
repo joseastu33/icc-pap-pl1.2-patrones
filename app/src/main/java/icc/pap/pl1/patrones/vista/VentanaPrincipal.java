@@ -23,6 +23,7 @@ public class VentanaPrincipal extends JFrame implements ObservadorJuego {
 
     private final Color FONDO = new Color(15, 20, 55);
     private final Color PANEL = new Color(30, 35, 85);
+    private final Color BORDE = new Color(135, 100, 230);
 
     public VentanaPrincipal(
             PartidaSnake partidaSnake,
@@ -41,21 +42,21 @@ public class VentanaPrincipal extends JFrame implements ObservadorJuego {
         setTitle("SnakeLab - Minijuego");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1500, 950);
-        setMinimumSize(new Dimension(1100, 750));
+        setMinimumSize(new Dimension(1250, 800));
         setLocationRelativeTo(null);
 
         // PANEL PRINCIPAL
-        JPanel principal = new JPanel(new BorderLayout(15, 15));
+        JPanel principal = new JPanel(new BorderLayout(12, 12));
         principal.setBackground(FONDO);
 
         principal.setBorder(
-                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+                BorderFactory.createEmptyBorder(12, 12, 12, 12)
         );
 
         // ENCABEZADO
         principal.add(crearEncabezado(), BorderLayout.NORTH);
 
-        // Registrar VentanaPrincipal como observador
+        // REGISTRAR VENTANA COMO OBSERVADOR
         partidaSnake.agregarObservador(this);
 
         // CONTENEDOR DE LAS TRES COLUMNAS
@@ -64,50 +65,36 @@ public class VentanaPrincipal extends JFrame implements ObservadorJuego {
 
         GridBagConstraints gbc = new GridBagConstraints();
 
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(10, 5, 10, 5);
         gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(5, 5, 5, 5);
         gbc.weighty = 1;
 
         // COLUMNA IZQUIERDA
         gbc.gridx = 0;
-        gbc.weightx = 0.20;
+        gbc.weightx = 0;
 
-        contenido.add(crearPanelIzquierdo(), gbc);
+        JPanel panelIzquierdo = crearPanelIzquierdo();
+        panelIzquierdo.setPreferredSize(new Dimension(300, 700));
 
-        // COLUMNA CENTRAL: TABLERO
+        contenido.add(panelIzquierdo, gbc);
+
+        // COLUMNA CENTRAL
         gbc.gridx = 1;
-        gbc.weightx = 0.60;
+        gbc.weightx = 1;
 
-        JPanel panelCentral = new JPanel(new BorderLayout());
-        panelCentral.setBackground(PANEL);
-
-        panelCentral.setBorder(
-                BorderFactory.createLineBorder(
-                        new Color(135, 100, 230), 3
-                )
-        );
-
-        PanelTablero tablero = new PanelTablero(partidaSnake);
-
-        // Registrar tablero como observador
-        partidaSnake.agregarObservador(tablero);
-
-        JScrollPane scrollTablero = new JScrollPane(tablero);
-        scrollTablero.setBorder(null);
-
-        panelCentral.add(
-                scrollTablero,
-                BorderLayout.CENTER
-        );
+        JPanel panelCentral = crearPanelCentral();
 
         contenido.add(panelCentral, gbc);
 
-        // COLUMNA DERECHA: GENERAR COMIDA
+        // COLUMNA DERECHA
         gbc.gridx = 2;
-        gbc.weightx = 0.20;
+        gbc.weightx = 0;
 
-        contenido.add(crearPanelDerecho(), gbc);
+        JPanel panelDerecho = crearPanelDerecho();
+        panelDerecho.setPreferredSize(new Dimension(280, 700));
+
+        contenido.add(panelDerecho, gbc);
 
         // AGREGAR CONTENIDO A LA VENTANA
         principal.add(contenido, BorderLayout.CENTER);
@@ -122,19 +109,15 @@ public class VentanaPrincipal extends JFrame implements ObservadorJuego {
         encabezado.setBackground(FONDO);
 
         encabezado.setBorder(
-                BorderFactory.createEmptyBorder(
-                        10, 10, 20, 10
-                )
+                BorderFactory.createEmptyBorder(8, 8, 15, 8)
         );
 
         JLabel titulo = new JLabel("SnakeLab  |  Minijuego");
 
         titulo.setForeground(Color.WHITE);
-        titulo.setFont(
-                new Font("Arial", Font.BOLD, 30)
-        );
+        titulo.setFont(new Font("Arial", Font.BOLD, 30));
 
-        // Etiqueta dinámica del estado
+        // ESTADO DINÁMICO
         etiquetaEstado = new JLabel("Estado: PREPARADO");
 
         etiquetaEstado.setForeground(
@@ -151,6 +134,36 @@ public class VentanaPrincipal extends JFrame implements ObservadorJuego {
         return encabezado;
     }
 
+    // PANEL CENTRAL DEL TABLERO
+    private JPanel crearPanelCentral() {
+
+        JPanel panelCentral = new JPanel(new GridBagLayout());
+        panelCentral.setBackground(PANEL);
+
+        // BORDE MORADO DEL TABLERO
+        panelCentral.setBorder(
+                BorderFactory.createLineBorder(BORDE, 3)
+        );
+
+        PanelTablero tablero = new PanelTablero(partidaSnake);
+
+        // REGISTRAR TABLERO COMO OBSERVADOR
+        partidaSnake.agregarObservador(tablero);
+
+        // CENTRAR EL TABLERO DENTRO DEL PANEL
+        GridBagConstraints gbcTablero = new GridBagConstraints();
+
+        gbcTablero.gridx = 0;
+        gbcTablero.gridy = 0;
+        gbcTablero.anchor = GridBagConstraints.CENTER;
+        gbcTablero.weightx = 1;
+        gbcTablero.weighty = 1;
+
+        panelCentral.add(tablero, gbcTablero);
+
+        return panelCentral;
+    }
+
     // PANEL IZQUIERDO
     private JPanel crearPanelIzquierdo() {
 
@@ -163,7 +176,7 @@ public class VentanaPrincipal extends JFrame implements ObservadorJuego {
         panel.add(panelControles);
         panel.add(panelMarcador);
 
-        // Registrar marcador como observador
+        // REGISTRAR MARCADOR COMO OBSERVADOR
         partidaSnake.agregarObservador(panelMarcador);
 
         return panel;
@@ -171,7 +184,6 @@ public class VentanaPrincipal extends JFrame implements ObservadorJuego {
 
     // PANEL DERECHO
     private JPanel crearPanelDerecho() {
-
         return panelComida;
     }
 
@@ -214,7 +226,7 @@ public class VentanaPrincipal extends JFrame implements ObservadorJuego {
         });
     }
 
-    // CONVERTIR EL TIPO SELECCIONADO AL ENUM
+    // CONVERTIR EL TIPO DE COMIDA AL ENUM
     private TipoComidaSnake convertirTipo(String tipo) {
 
         switch (tipo) {
@@ -283,6 +295,7 @@ public class VentanaPrincipal extends JFrame implements ObservadorJuego {
             if (estadoActual.equals("EstadoPreparado")) {
 
                 etiquetaEstado.setText("Estado: PREPARADO");
+
                 etiquetaEstado.setForeground(
                         new Color(170, 255, 120)
                 );
@@ -290,6 +303,7 @@ public class VentanaPrincipal extends JFrame implements ObservadorJuego {
             } else if (estadoActual.equals("EstadoJugando")) {
 
                 etiquetaEstado.setText("Estado: JUGANDO");
+
                 etiquetaEstado.setForeground(
                         new Color(170, 255, 120)
                 );
@@ -297,11 +311,13 @@ public class VentanaPrincipal extends JFrame implements ObservadorJuego {
             } else if (estadoActual.equals("EstadoPausado")) {
 
                 etiquetaEstado.setText("Estado: PAUSADO");
+
                 etiquetaEstado.setForeground(Color.YELLOW);
 
             } else if (estadoActual.equals("EstadoTerminado")) {
 
                 etiquetaEstado.setText("Estado: TERMINADO");
+
                 etiquetaEstado.setForeground(Color.RED);
             }
         });
