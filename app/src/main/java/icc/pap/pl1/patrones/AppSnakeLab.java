@@ -8,12 +8,12 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-
+import icc.pap.pl1.patrones.modelo.CoordenadasTablero;
 import icc.pap.pl1.patrones.decorador.GestorEfectos;
 import icc.pap.pl1.patrones.juego.MotorJuego;
 import icc.pap.pl1.patrones.juego.PartidaSnake;
 import icc.pap.pl1.patrones.modelo.ComidaSnake;
-import icc.pap.pl1.patrones.modelo.CoordenadasTablero;
+
 import icc.pap.pl1.patrones.modelo.SegmentoSnake;
 import icc.pap.pl1.patrones.modelo.SentidoMovimiento;
 import icc.pap.pl1.patrones.modelo.SerpienteSnake;

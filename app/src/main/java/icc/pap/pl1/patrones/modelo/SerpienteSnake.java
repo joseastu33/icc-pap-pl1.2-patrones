@@ -10,10 +10,19 @@ public class SerpienteSnake {
     private List<SegmentoSnake> cuerpoSerpiente; //se usa UNA SOLA LISTA para al querer obtener la cabeza y COLA se consulte
     //es consultado al indice 0 y -1
     private SentidoMovimiento sentidoMovimiento;
-
+    private final List<CoordenadasTablero> cuerpoInicial;
+    private final SentidoMovimiento sentidoInicial;
     public SerpienteSnake(List<SegmentoSnake> cuerpoSerpiente, SentidoMovimiento sentidoMovimiento) {
         this.cuerpoSerpiente = cuerpoSerpiente;
         this.sentidoMovimiento = sentidoMovimiento;
+        this.cuerpoInicial = cuerpoSerpiente.stream()
+        .map(segmento -> new CoordenadasTablero(
+                segmento.getCoordenadasTablero().getCoorX(),
+                segmento.getCoordenadasTablero().getCoorY()
+        ))
+        .toList();
+
+this.sentidoInicial = sentidoMovimiento;
     }
 
     public List<SegmentoSnake> getCuerpoSerpiente() {
@@ -93,7 +102,25 @@ public class SerpienteSnake {
 
     }
     
+public void reiniciar() {
 
+    cuerpoSerpiente.clear();
+
+    for (CoordenadasTablero coordenada : cuerpoInicial) {
+
+        CoordenadasTablero nuevaCoordenada =
+                new CoordenadasTablero(
+                        coordenada.getCoorX(),
+                        coordenada.getCoorY()
+                );
+
+        cuerpoSerpiente.add(
+                new SegmentoSnake(nuevaCoordenada)
+        );
+    }
+
+    sentidoMovimiento = sentidoInicial;
+}
     
     
 }
