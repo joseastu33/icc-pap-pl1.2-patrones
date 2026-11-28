@@ -224,4 +224,31 @@ public class PartidaSnake implements SujetoJuego{
         return tableroJuego;
     }
     
+    public void reiniciarPartida() {
+
+    // Recuperar posición y dirección inicial de la serpiente
+    serpienteSnake.reiniciar();
+
+    // Reiniciar puntuación
+    puntuacion = 0;
+
+    // Eliminar efectos activos
+    gestorEfectos.reiniciar();
+
+    // Generar comida nueva
+    comidaSnake = generadorComida.generarComidaSnake(
+            tableroJuego,
+            serpienteSnake
+    );
+
+    // Recuperar el estado inicial
+    if (comidaSnake == null) {
+        estadoActual = new EstadoTerminado(this);
+    } else {
+        estadoActual = new EstadoPreparado(this);
+    }
+
+    // Actualizar todos los observadores
+    notificarObservadores(crearEstadoVista());
+}
 }

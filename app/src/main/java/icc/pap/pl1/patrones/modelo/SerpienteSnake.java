@@ -101,7 +101,8 @@ this.sentidoInicial = sentidoMovimiento;
         }
 
     }
-    
+    //recuperacion del cuerpo original sin convervar la posiciones modificadas durante la partida
+    //ponemos en una poscicion y  direccion original para regresar al incio
 public void reiniciar() {
 
     cuerpoSerpiente.clear();
