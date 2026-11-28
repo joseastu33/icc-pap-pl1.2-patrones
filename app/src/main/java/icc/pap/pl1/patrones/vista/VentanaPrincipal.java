@@ -2,11 +2,12 @@
 package icc.pap.pl1.patrones.vista;
 
 import javax.swing.*;
-
+import java.awt.*;
+import icc.pap.pl1.patrones.observer.ObservadorJuego;
+import icc.pap.pl1.patrones.observer.EstadoJuegoVista;
+import icc.pap.pl1.patrones.modelo.TipoComidaSnake;
 import icc.pap.pl1.patrones.juego.MotorJuego;
 import icc.pap.pl1.patrones.juego.PartidaSnake;
-
-import java.awt.*;
 
 public class VentanaPrincipal extends JFrame {
 
@@ -32,6 +33,7 @@ public class VentanaPrincipal extends JFrame {
         this.panelComida = new PanelComida();
 
         configurarControles();
+        configurarPanelComida();
 
         setTitle("SnakeLab - Minijuego");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -166,7 +168,7 @@ public class VentanaPrincipal extends JFrame {
         return panelComida;
     }
 
-    // CONFIGURACIÓN DE LOS BOTONES
+    // CONFIGURACIÓN DE LOS CONTROLES
     private void configurarControles() {
 
         // INICIAR
@@ -202,6 +204,64 @@ public class VentanaPrincipal extends JFrame {
 
             repaint();
 
+        });
+    }
+
+    // CONVERTIR EL TIPO SELECCIONADO AL ENUM
+    private TipoComidaSnake convertirTipo(String tipo) {
+
+        switch (tipo) {
+
+            case "Puntuación doble":
+                return TipoComidaSnake.PUNTUACION_DOBLE;
+
+            case "Velocidad":
+                return TipoComidaSnake.VELOCIDAD;
+
+            case "Crecimiento":
+                return TipoComidaSnake.CRECIMIENTO;
+
+            default:
+                return TipoComidaSnake.NORMAL;
+        }
+    }
+
+    // CONFIGURACIÓN DEL PANEL DE COMIDA
+    private void configurarPanelComida() {
+
+        // UBICAR COMIDA MANUALMENTE
+        panelComida.getBotonUbicar().addActionListener(e -> {
+
+            int x = panelComida.getCoordenadaX();
+            int y = panelComida.getCoordenadaY();
+
+            TipoComidaSnake tipo = convertirTipo(
+                    panelComida.getTipoComidaSeleccionado()
+            );
+
+            boolean correcto = partidaSnake.ubicarComida(x, y, tipo);
+
+            if (!correcto) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "La posición está ocupada o fuera del tablero."
+                );
+            }
+        });
+
+        // GENERAR COMIDA ALEATORIA
+        panelComida.getBotonAleatorio().addActionListener(e -> {
+
+            boolean generado = partidaSnake.generarComidaAleatoria();
+
+            if (!generado) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No hay espacio disponible para generar comida."
+                );
+            }
         });
     }
 }
