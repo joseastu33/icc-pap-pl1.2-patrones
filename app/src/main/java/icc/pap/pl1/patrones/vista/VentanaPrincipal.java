@@ -9,40 +9,53 @@ import icc.pap.pl1.patrones.juego.PartidaSnake;
 import java.awt.*;
 
 public class VentanaPrincipal extends JFrame {
+
     private final PartidaSnake partidaSnake;
     private final MotorJuego motorJuego;
+
     private final PanelControles panelControles;
     private final PanelMarcador panelMarcador;
+    private final PanelComida panelComida;
+
     private final Color FONDO = new Color(15, 20, 55);
     private final Color PANEL = new Color(30, 35, 85);
 
-    public VentanaPrincipal(PartidaSnake partidaSnake, MotorJuego motorJuego) {
+    public VentanaPrincipal(
+            PartidaSnake partidaSnake,
+            MotorJuego motorJuego) {
+
         this.partidaSnake = partidaSnake;
         this.motorJuego = motorJuego;
+
         this.panelControles = new PanelControles();
         this.panelMarcador = new PanelMarcador();
+        this.panelComida = new PanelComida();
+
         configurarControles();
+
         setTitle("SnakeLab - Minijuego");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1500, 950);
         setMinimumSize(new Dimension(1100, 750));
         setLocationRelativeTo(null);
 
-        // Panel principal
+        // PANEL PRINCIPAL
         JPanel principal = new JPanel(new BorderLayout(15, 15));
         principal.setBackground(FONDO);
+
         principal.setBorder(
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)
         );
 
-        // Encabezado
+        // ENCABEZADO
         principal.add(crearEncabezado(), BorderLayout.NORTH);
 
-        // Contenedor de las tres columnas
+        // CONTENEDOR DE LAS TRES COLUMNAS
         JPanel contenido = new JPanel(new GridBagLayout());
         contenido.setBackground(FONDO);
 
         GridBagConstraints gbc = new GridBagConstraints();
+
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(10, 5, 10, 5);
         gbc.gridy = 0;
@@ -50,13 +63,13 @@ public class VentanaPrincipal extends JFrame {
 
         // COLUMNA IZQUIERDA
         gbc.gridx = 0;
-        gbc.weightx = 0.15;
+        gbc.weightx = 0.20;
 
         contenido.add(crearPanelIzquierdo(), gbc);
 
-        // COLUMNA CENTRAL
+        // COLUMNA CENTRAL: TABLERO
         gbc.gridx = 1;
-        gbc.weightx = 0.70;
+        gbc.weightx = 0.60;
 
         JPanel panelCentral = new JPanel(new BorderLayout());
         panelCentral.setBackground(PANEL);
@@ -68,27 +81,27 @@ public class VentanaPrincipal extends JFrame {
         );
 
         PanelTablero tablero = new PanelTablero(partidaSnake);
+
+        // Registrar tablero como observador
         partidaSnake.agregarObservador(tablero);
 
-        // El tablero se agrega al centro automáticamente
         JScrollPane scrollTablero = new JScrollPane(tablero);
         scrollTablero.setBorder(null);
-        panelCentral.add(scrollTablero, BorderLayout.CENTER);
-        scrollTablero.getViewport().addChangeListener(e -> {
-        System.out.println(
-        "VIEWPORT | Posición: "
-        + scrollTablero.getViewport().getViewPosition()
-        + " | Área visible: "
-        + scrollTablero.getViewport().getExtentSize());});
+
+        panelCentral.add(
+                scrollTablero,
+                BorderLayout.CENTER
+        );
+
         contenido.add(panelCentral, gbc);
 
-        // COLUMNA DERECHA
+        // COLUMNA DERECHA: GENERAR COMIDA
         gbc.gridx = 2;
-        gbc.weightx = 0.15;
+        gbc.weightx = 0.20;
 
         contenido.add(crearPanelDerecho(), gbc);
 
-        // Agregar contenido a la ventana
+        // AGREGAR CONTENIDO A LA VENTANA
         principal.add(contenido, BorderLayout.CENTER);
 
         add(principal);
@@ -101,16 +114,27 @@ public class VentanaPrincipal extends JFrame {
         encabezado.setBackground(FONDO);
 
         encabezado.setBorder(
-                BorderFactory.createEmptyBorder(10, 10, 20, 10)
+                BorderFactory.createEmptyBorder(
+                        10, 10, 20, 10
+                )
         );
 
         JLabel titulo = new JLabel("SnakeLab  |  Minijuego");
+
         titulo.setForeground(Color.WHITE);
-        titulo.setFont(new Font("Arial", Font.BOLD, 30));
+        titulo.setFont(
+                new Font("Arial", Font.BOLD, 30)
+        );
 
         JLabel estado = new JLabel("Estado: PREPARADO");
-        estado.setForeground(new Color(170, 255, 120));
-        estado.setFont(new Font("Arial", Font.BOLD, 20));
+
+        estado.setForeground(
+                new Color(170, 255, 120)
+        );
+
+        estado.setFont(
+                new Font("Arial", Font.BOLD, 20)
+        );
 
         encabezado.add(titulo, BorderLayout.WEST);
         encabezado.add(estado, BorderLayout.EAST);
@@ -120,71 +144,64 @@ public class VentanaPrincipal extends JFrame {
 
     // PANEL IZQUIERDO
     private JPanel crearPanelIzquierdo() {
-        JPanel panel = new JPanel(new GridLayout(2, 1, 10, 10));
+
+        JPanel panel = new JPanel(
+                new GridLayout(2, 1, 10, 10)
+        );
+
         panel.setBackground(FONDO);
-        //los paneles genericos se sustituyen porque
-        //ya existen componentes que sirven para eso
+
         panel.add(panelControles);
         panel.add(panelMarcador);
+
+        // Registrar marcador como observador
         partidaSnake.agregarObservador(panelMarcador);
+
         return panel;
     }
 
     // PANEL DERECHO
     private JPanel crearPanelDerecho() {
 
-        return crearPanelBase("Generar comida");
+        return panelComida;
     }
 
-    // MÉTODO PARA CREAR PANELES
-    private JPanel crearPanelBase(String titulo) {
+    // CONFIGURACIÓN DE LOS BOTONES
+    private void configurarControles() {
 
-        JPanel panel = new JPanel();
-
-        panel.setLayout(
-                new BoxLayout(panel, BoxLayout.Y_AXIS)
-        );
-
-        panel.setBackground(PANEL);
-
-        panel.setBorder(
-                BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(120, 110, 220), 2),
-                BorderFactory.createEmptyBorder(15, 15, 15, 15)));
-
-        JLabel etiqueta = new JLabel(titulo);
-        etiqueta.setForeground(Color.WHITE);
-        etiqueta.setFont(
-                new Font("Arial", Font.BOLD, 20)
-        );
-
-        panel.add(etiqueta);
-
-        return panel;
-    }
-
-    private void configurarControles(){
+        // INICIAR
         panelControles.getBotonIniciar().addActionListener(e -> {
-                partidaSnake.iniciarJuego();
-                motorJuego.iniciarMotorJuego();});
-        panelControles.getBotonPausar().addActionListener(e -> {
-                partidaSnake.pausarJuego();
-                motorJuego.detenerMotorJuego();});
-        panelControles.getBotonReanudar().addActionListener(e -> {
-                partidaSnake.reanudarJuego();
-                motorJuego.iniciarMotorJuego();
+
+            partidaSnake.iniciarJuego();
+            motorJuego.iniciarMotorJuego();
+
         });
-        //conexion con el boton reinciar 
-       panelControles.getBotonReiniciar().addActionListener(e -> {
 
-    // Detener el temporizador
-    motorJuego.detenerMotorJuego();
+        // PAUSAR
+        panelControles.getBotonPausar().addActionListener(e -> {
 
-    // Reiniciar la partida
-    partidaSnake.reiniciarPartida();
+            partidaSnake.pausarJuego();
+            motorJuego.detenerMotorJuego();
 
-    // Actualizar el tablero
-    repaint();
+        });
 
-});
+        // REANUDAR
+        panelControles.getBotonReanudar().addActionListener(e -> {
+
+            partidaSnake.reanudarJuego();
+            motorJuego.iniciarMotorJuego();
+
+        });
+
+        // REINICIAR
+        panelControles.getBotonReiniciar().addActionListener(e -> {
+
+            motorJuego.detenerMotorJuego();
+
+            partidaSnake.reiniciarPartida();
+
+            repaint();
+
+        });
     }
 }
