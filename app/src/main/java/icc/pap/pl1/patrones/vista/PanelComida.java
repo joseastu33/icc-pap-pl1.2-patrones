@@ -6,7 +6,14 @@ import java.awt.*;
 
 public class PanelComida extends JPanel {
 
-    private final JComboBox<String> comboTipoComida;
+    private final JComboBox<String> comboTipoComida = new JComboBox<>(
+    new String[] {
+        "Normal",
+        "Puntuación doble",
+        "Velocidad",
+        "Crecimiento"
+    }
+);
     private final JSpinner spinnerX;
     private final JSpinner spinnerY;
 
@@ -221,4 +228,5 @@ public class PanelComida extends JPanel {
     public String getTipoComidaSeleccionado() {
         return (String) comboTipoComida.getSelectedItem();
     }
+    
 }
